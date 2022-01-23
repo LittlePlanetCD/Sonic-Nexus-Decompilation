@@ -1,6 +1,6 @@
 
 # Sonic Nexus (2008, RSDK) Decompilation for the Nintendo Switch
-A Full Decompilation of Sonic Nexus (2008) by Taxman, made by RDC, ported to Nintendo Switch via hackery using HeyJoeWay's CD switch port as a baseline.
+A Full Decompilation of Sonic Nexus (2008) by Taxman, made by RDC, ported to Nintendo Switch via hackery using HeyJoeWay's CD switch port as a baseline for fixes.
 
 # Installation Instructions
 
