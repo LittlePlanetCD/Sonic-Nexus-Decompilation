@@ -1,5 +1,12 @@
 #include "RetroEngine.hpp"
 
+#if defined(__SWITCH__)
+    #include "filesystem.hpp"
+    #define STD_FILESYSTEM ghc::filesystem
+#else
+    #define STD_FILESYSTEM std::filesystem
+#endif
+
 int globalVariablesCount;
 int globalVariables[GLOBALVAR_COUNT];
 char globalVariableNames[GLOBALVAR_COUNT][0x20];
@@ -342,7 +349,7 @@ void writeSettings() {
 #if RETRO_PLATFORM == RETRO_ANDROID
 namespace fs = std::__fs::filesystem;
 #else
-namespace fs = std::filesystem;
+namespace fs = STD_FILESYSTEM;
 #endif
 
 void initMods()

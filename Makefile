@@ -1,63 +1,147 @@
+.DEFAULT_GOAL := all
+
+NAME		=  nexus2008
+SUFFIX		= 
+PKGCONFIG	=  pkg-config
+DEBUG		?= 0
+STATIC		?= 1
+VERBOSE		?= 0
+PROFILE		?= 0
+STRIP		?= strip
+
+# -fsigned-char required to prevent hang in LoadStageCollisions
+CFLAGS		?= -fsigned-char
+
+# =============================================================================
+# Detect default platform if not explicitly specified
+# =============================================================================
+
+ifeq ($(OS),Windows_NT)
+	PLATFORM ?= Windows
+else
+	UNAME_S := $(shell uname -s)
+
+	ifeq ($(UNAME_S),Linux)
+		PLATFORM ?= Linux
+	endif
+
+	ifeq ($(UNAME_S),Darwin)
+		PLATFORM ?= macOS
+	endif
+
+endif
+
+ifdef EMSCRIPTEN
+	PLATFORM = Emscripten
+endif
+
+PLATFORM ?= Unknown
+
+# =============================================================================
+
+OUTDIR = bin/$(PLATFORM)
+OBJDIR = objects/$(PLATFORM)
+
+include Makefile_cfgs/Platforms/$(PLATFORM).cfg
+
+# =============================================================================
+
 ifeq ($(STATIC),1)
-  PKG_CONFIG_STATIC_FLAG = --static
-  CXXFLAGS_ALL += -static
+	PKGCONFIG +=  --static
 endif
 
-CXXFLAGS_ALL += -MMD -MP -MF objects/$*.d $(shell pkg-config --cflags $(PKG_CONFIG_STATIC_FLAG) sdl2 vorbisfile vorbis) $(CXXFLAGS) 
-LDFLAGS_ALL += $(LDFLAGS)
-LIBS_ALL += $(shell pkg-config --libs $(PKG_CONFIG_STATIC_FLAG) sdl2 vorbisfile vorbis) -pthread $(LIBS)
-
-SOURCES = \
-  Nexus/Animation.cpp \
-  Nexus/Audio.cpp \
-  Nexus/Collision.cpp \
-  Nexus/Debug.cpp \
-  Nexus/Drawing.cpp \
-  Nexus/Ini.cpp \
-  Nexus/Input.cpp \
-  Nexus/main.cpp \
-  Nexus/Math.cpp \
-  Nexus/Object.cpp \
-  Nexus/Palette.cpp \
-  Nexus/Player.cpp \
-  Nexus/Reader.cpp \
-  Nexus/RetroEngine.cpp \
-  Nexus/Scene.cpp \
-  Nexus/Script.cpp \
-  Nexus/Sprite.cpp \
-  Nexus/String.cpp \
-  Nexus/Text.cpp \
-  Nexus/Userdata.cpp \
-  Nexus/Video.cpp
-
-	  
-ifeq ($(FORCE_CASE_INSENSITIVE),1)
-  CXXFLAGS_ALL += -DFORCE_CASE_INSENSITIVE
-  SOURCES += Nexus/fcaseopen.c
+ifeq ($(DEBUG),1)
+	CFLAGS += -g
+	STRIP = :
+else
+	CFLAGS += -O3
 endif
 
-ifeq ($(USE_HW_REN),1)
-  CXXFLAGS_ALL += -DUSE_HW_REN
-  LIBS_ALL += -lGL -lGLEW
+ifeq ($(PROFILE),1)
+	CFLAGS += -pg -g -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls -fno-default-inline
 endif
 
-OBJECTS = $(SOURCES:%=objects/%.o)
-DEPENDENCIES = $(SOURCES:%=objects/%.d)
+ifeq ($(VERBOSE),0)
+	CC := @$(CC)
+	CXX := @$(CXX)
+endif
 
-all: bin/nexus
+# =============================================================================
 
-include $(wildcard $(DEPENDENCIES))
+CFLAGS += `$(PKGCONFIG) --cflags sdl2 ogg vorbis theora vorbisfile theoradec`
+LIBS   += `$(PKGCONFIG) --libs-only-l --libs-only-L sdl2 ogg vorbis theora vorbisfile theoradec`
 
-objects/%.o: %
-	mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS_ALL) -std=c++17 $< -o $@ -c
+#CFLAGS += -Wno-strict-aliasing -Wno-narrowing -Wno-write-strings
 
-bin/nexus: $(OBJECTS)
-	mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS_ALL) $(LDFLAGS_ALL) $^ -o $@ $(LIBS_ALL)
+ifeq ($(STATIC),1)
+	CFLAGS += -static
+endif
 
-install: bin/nexus
-	install -Dp -m755 bin/nexus $(prefix)/bin/nexus
+INCLUDES  += 	-I./Nexus \
+				-I./dependencies/all/theoraplay
+
+INCLUDES += $(LIBS)
+
+# Main Sources
+SOURCES	+=	Nexus/Animation \
+			Nexus/Audio \
+			Nexus/Collision \
+			Nexus/Debug \
+			Nexus/Drawing \
+			Nexus/fcaseopen \
+			Nexus/Ini \
+			Nexus/Input \
+			Nexus/main \
+			Nexus/Math \
+			Nexus/Object \
+			Nexus/Palette \
+			Nexus/Player \
+			Nexus/Reader \
+			Nexus/RetroEngine \
+			Nexus/Scene \
+			Nexus/Script \
+			Nexus/Sprite \
+			Nexus/String \
+			Nexus/Text \
+			Nexus/Userdata \
+			Nexus/Video
+
+# Theoraplay sources
+SOURCES +=	dependencies/all/theoraplay/theoraplay
+
+PKGSUFFIX ?= $(SUFFIX)
+
+BINPATH = $(OUTDIR)/$(NAME)$(SUFFIX)
+PKGPATH = $(OUTDIR)/$(NAME)$(PKGSUFFIX)
+
+OBJECTS += $(addprefix $(OBJDIR)/, $(addsuffix .o, $(SOURCES)))
+
+$(shell mkdir -p $(OUTDIR))
+$(shell mkdir -p $(OBJDIR))
+
+$(OBJDIR)/%.o: %.c
+	@mkdir -p $(@D)
+	@echo -n Compiling $<...
+	$(CC) -c $(CFLAGS) $(INCLUDES) $(DEFINES) $< -o $@
+	@echo " Done!"
+
+$(OBJDIR)/%.o: %.cpp
+	@mkdir -p $(@D)
+	@echo -n Compiling $<...
+	$(CXX) -c $(CFLAGS) $(INCLUDES) $(DEFINES) $< -o $@
+	@echo " Done!"
+
+$(BINPATH): $(OBJDIR) $(OBJECTS)
+	@echo -n Linking...
+	$(CXX) $(CFLAGS) $(LDFLAGS) $(OBJECTS) -o $@ $(LIBS)
+	@echo " Done!"
+	$(STRIP) $@
+
+ifeq ($(BINPATH),$(PKGPATH))
+all: $(BINPATH)
+else
+all: $(PKGPATH)
+endif
 
 clean:
-	 rm -r -f bin && rm -r -f objects
+	rm -rf $(OBJDIR)

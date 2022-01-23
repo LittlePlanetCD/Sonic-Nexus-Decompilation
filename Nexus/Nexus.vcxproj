@@ -415,7 +415,7 @@ copy /Y "$(SolutionDir)dependencies\windows\glew\bin\Release\$(Platform)\glew32.
     <ResourceCompile Include="Nexus.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Nexus.ico" />
+    <Image Include="win.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

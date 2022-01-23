@@ -1,42 +1,26 @@
-# Sonic Nexus (2008, RSDK) Decompilation
-A Full Decompilation of Sonic Nexus (2008), a Retro Engine game made by Taxman.
 
-# How to build:
-## Windows:
-* Clone the repo, then follow the instructions in the [depencencies readme for Windows](./dependencies/windows/dependencies.txt) to setup dependencies, then build via the Visual Studio solution
-* or grab a prebuilt executable from the releases section, or if you have a github account, from the Github Actions tab. Be warned, these may or may not introduce issues so keep that in mind.
+# Sonic Nexus (2008, RSDK) Decompilation for the Nintendo Switch
+A Full Decompilation of Sonic Nexus (2008) by Taxman, made by RDC, ported to Nintendo Switch via hackery using HeyJoeWay's CD switch port as a baseline.
 
-## Windows UWP (Phone, Xbox, etc.):
-* Clone the repo, then follow the instructions in the [depencencies readme for Windows](./dependencies/windows/dependencies.txt) and [depencencies readme for UWP](./dependencies/win-uwp/dependencies.txt) to setup dependencies, then build and deploy via the UWP Visual Studio solution.
-* After install copy your `Data.rsdk` and `videos` folder into the apps localstate folder
+# Installation Instructions
 
-## Windows via MSYS2 (64-bit Only):
+You can find downloads in releases.
 
-* Download the newest version of the MSYS2 installer from [here](https://www.msys2.org/) and install it.
-* Run the MINGW64 prompt (from the windows Start Menu/MSYS2 64-bit/MSYS2 MinGW 64-bit), when the program starts enter `pacman -Syuu` in the prompt and hit Enter. Press `Y` when it asks if you want to update packages. If it asks you to close the prompt, do so, then restart it and run the same command again. This updates the packages to their latest versions.
-* Now install the dependencies with the following command: `pacman -S pkg-config make git mingw-w64-x86_64-gcc mingw-w64-x86_64-SDL2 mingw-w64-x86_64-libogg mingw-w64-x86_64-libvorbis mingw-w64-x86_64-libtheora`
-* Clone the repo with the following command: `git clone https://github.com/Rubberduckycooly/Sonic-Nexus-Decompilation.git`
-* Go into the repo you just cloned with `cd Sonic-Nexus-Decompilation`
-* Then run `make CXXFLAGS=-O2 CXX=x86_64-w64-mingw32-g++ STATIC=1 -j5` (-j switch is optional but will make building faster, it's based on the number of cores you have +1 so 8 cores wold be -j9)
+   1. Make sure your Switch can run homebrew.
+   2. Extract the contents of the zip to the root of your SD card.
+   3. Copy the assets to /switch/nexus2008 on your Switch's SD card. You will need the following files/folders:
+      
+      Data.bin / Data Folder 
+        
+   (if you extracted the Data.bin. This lets you get Dev Menu support and solve a music loop issue present in Nexus (and also CD for some reason))
 
-## Mac:
-* Clone the repo, then follow the instructions in the [depencencies readme for Mac](./dependencies/mac/dependencies.txt) to setup dependencies, then build via the Xcode project
-* or grab a prebuilt executable from the releases section
+   4. Start Sonic Nexus via hbmenu.
 
-## Linux:
-* To setup your build enviroment and library dependecies run the following commands:
-* Ubuntu (Mint, Pop!_OS, etc...): `sudo apt install build-essential git libsdl2-dev libvorbis-dev libogg-dev libtheora-dev`
-* Arch Linux: `sudo pacman -S base-devel git sdl2 libvorbis libogg libtheora`
-* Clone the repo with the following command: `git clone https://github.com/Rubberduckycooly/Sonic-Nexus-Decompilation.git`
-* Go into the repo you just cloned with `cd Sonic-Nexus-Decompilation`
-* Then run `make CXXFLAGS=-O2 -j5` (-j switch is optional but will make building faster, it's based on the number of cores you have +1 so 8 cores wold be -j9)
+NOTE: It is recommended to give the game full RAM access. This means you shouldn't launch hbmenu from the album applet when running this. With the latest Atmosphere build and its default config, you can hold R while starting any game to open hbmenu with full RAM access. If you have any issues make sure the game has full RAM access before reporting them; launching as an applet will not be supported.
 
-## Switch:
-* Head on over to [cosmic's fork](https://github.com/LittlePlanetCD/Sonic-Nexus-Decomp-Switch) and follow the installation instructions in the readme.
+# Known Bugs
 
-## Other platforms:
-Currently the only "officially" supported platforms are the ones listed above, however the backend uses libogg, libvorbis, libtheora & SDL2 to power it, so the codebase is very multiplatform.
-If you've cloned this repo and ported it to a platform not on the list or made some changes you'd like to see added to this repo, submit a pull request and it'll most likely be added
+There is no way to press a button to access the dev menu when in game. (hopefully can be figured out eventually)
 
 # Contact:
 Join the [Retro Engine Modding Discord Server](https://dc.railgun.works/retroengine) for any extra questions you may need to know about the decompilation or modding it.
