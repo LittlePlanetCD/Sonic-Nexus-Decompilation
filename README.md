@@ -1,6 +1,6 @@
 
 # Sonic Nexus (2008, RSDK) Decompilation for the Nintendo Switch
-A Full Decompilation of Sonic Nexus (2008) by Taxman, made by RDC, ported to Nintendo Switch via hackery using HeyJoeWay's CD switch port as a baseline.
+A Full Decompilation of Sonic Nexus (2008) by Taxman, made by RDC, ported to Nintendo Switch via hackery using HeyJoeWay's CD switch port as a baseline for fixes.
 
 # Installation Instructions
 
@@ -10,9 +10,9 @@ You can find downloads in releases.
    2. Extract the contents of the zip to the root of your SD card.
    3. Copy the assets to /switch/nexus2008 on your Switch's SD card. You will need the following files/folders:
       
-      Data.bin / Data Folder 
+      Data Folder 
         
-   (if you extracted the Data.bin. This lets you get Dev Menu support and solve a music loop issue present in Nexus (and also CD for some reason))
+   (if you extracted the Data.bin for the folder, This lets you get Dev Menu support and solve a bug regarding mods being loaded and crashing the game.)
 
    4. Start Sonic Nexus via hbmenu.
 
